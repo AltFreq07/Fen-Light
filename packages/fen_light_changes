@@ -1,8 +1,5 @@
 [COLOR darkgoldenrod]GOD BLESS HIM AND KEEP HIM SAFE.[/COLOR]
 
-[COLOR red][B]Online Release Version 2.0.02[/B][/COLOR]
-- Oop. Spoke too soon.
-- Fix for browsing/downloading pack results through RD.
-- Quick fix for some media causing error when saving to favorites.
-- Quick fix to correct sequential playback.
-- Final release of this addon. Hopefully. So long all.
+[COLOR red][B]Online Release Version 2.0.03[/B][/COLOR]
+- Fixed Reviews in Extras Menu. Clear IMDb cache and restart Kodi to refresh new data.
+- Added some to the Years menu.
