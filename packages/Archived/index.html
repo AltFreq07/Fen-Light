@@ -1,11 +1,45 @@
 <!DOCTYPE html>
-<a href="plugin.video.fen-3.2.30.zip">plugin.video.fen-3.2.30.zip</a></br>
-<a href="plugin.video.fen-3.5.01.zip">plugin.video.fen-3.5.01.zip</a></br>
-<a href="plugin.video.fen-3.5.02.zip">plugin.video.fen-3.5.02.zip</a></br>
-<a href="plugin.video.fenlight-1.0.92.zip">plugin.video.fenlight-1.0.92.zip</a></br>
-<a href="plugin.video.fenlight-1.0.94.zip">plugin.video.fenlight-1.0.94.zip</a></br>
-<a href="plugin.video.fenlight-2.0.01.zip">plugin.video.fenlight-2.0.01.zip</a></br>
-<a href="plugin.video.fenlight-2.0.02.zip">plugin.video.fenlight-2.0.02.zip</a></br>
-<a href="plugin.video.fenlight-2.0.03.zip">plugin.video.fenlight-2.0.03.zip</a></br>
-<a href="plugin.video.fenlight-2.0.04.zip">plugin.video.fenlight-2.0.04.zip</a></br>
-<a href="plugin.video.fenlight-2.0.05.zip">plugin.video.fenlight-2.0.05.zip</a></br>s
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archived Files</title>
+</head>
+<body>
+    <h1>Archived Files</h1>
+    <div id="archived-zip-files"></div>
+
+    <script>
+        // GitHub API URL for the contents of the 'Archived' directory
+        const apiUrl = "https://api.github.com/repos/AltFreq07/Fen-Light-Repo/contents/packages/Archived";
+
+        async function fetchArchivedZipFiles() {
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error("Failed to fetch data from GitHub API");
+                }
+                const data = await response.json();
+
+                // Filter for .zip files
+                const zipFiles = data.filter(file => file.name.endsWith(".zip"));
+
+                // Add links for each .zip file
+                const zipContainer = document.getElementById("archived-zip-files");
+                zipFiles.forEach(file => {
+                    const link = document.createElement("a");
+                    link.href = file.download_url; // Use the direct download URL
+                    link.innerText = file.name;
+                    zipContainer.appendChild(link);
+                    zipContainer.appendChild(document.createElement("br"));
+                });
+            } catch (error) {
+                console.error("Error fetching archived zip files:", error);
+            }
+        }
+
+        // Fetch and display archived zip files
+        fetchArchivedZipFiles();
+    </script>
+</body>
+</html>

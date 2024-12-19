@@ -1,3 +1,46 @@
 <!DOCTYPE html>
-<a href="Archived">Archived</a><br>
-<a href="plugin.video.fenlight-2.0.06.zip">plugin.video.fenlight-2.0.06.zip</a>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fen Light Repo</title>
+</head>
+<body>
+    <h1>Fen Light Repo</h1>
+    <a href="Archived">Archived</a><br>
+    <div id="zip-files"></div>
+
+    <script>
+        // GitHub API URL for the contents of the 'packages' directory
+        const apiUrl = "https://api.github.com/repos/AltFreq07/Fen-Light-Repo/contents/packages";
+
+        async function fetchZipFiles() {
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error("Failed to fetch data from GitHub API");
+                }
+                const data = await response.json();
+
+                // Filter for .zip files
+                const zipFiles = data.filter(file => file.name.endsWith(".zip"));
+
+                // Add links for each .zip file
+                const zipContainer = document.getElementById("zip-files");
+                zipFiles.forEach(file => {
+                    const link = document.createElement("a");
+                    link.href = file.download_url; // Use the direct download URL
+                    link.innerText = file.name;
+                    zipContainer.appendChild(link);
+                    zipContainer.appendChild(document.createElement("br"));
+                });
+            } catch (error) {
+                console.error("Error fetching zip files:", error);
+            }
+        }
+
+        // Fetch and display zip files
+        fetchZipFiles();
+    </script>
+</body>
+</html>
