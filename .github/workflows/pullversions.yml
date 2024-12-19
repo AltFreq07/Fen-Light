@@ -3,6 +3,8 @@ name: pull version and change log from source
 on:
   workflow_dispatch: # Manual trigger
   repository_dispatch: # Triggered by another repo if configured
+    types:
+    - trigger-event
 
 jobs:
   sync-files:
