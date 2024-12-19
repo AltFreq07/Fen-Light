@@ -8,26 +8,59 @@ jobs:
   sync-files:
     runs-on: ubuntu-latest
     steps:
-      # Checkout the current repository
+      # Step 1: Checkout the current repository
       - name: Checkout current repository
         uses: actions/checkout@v3
 
-      # Clone the other repository
+      # Step 2: Clone the other repository
       - name: Clone source repository
         run: |
           git clone --depth 1 https://github.com/altfreq07/plugin.video.fenlight.git source-repo
 
-      # Sync files
+      # Step 3: Sync files
       - name: Sync files
         run: |
           rsync -av --delete source-repo/fen_light_changes source-repo/fen_light_version ./packages/
 
-      # Remove the source-repo folder
+      # Step 4: Move .zip files to packages/Archived
+      - name: Archive .zip files
+        run: |
+          mkdir -p packages/Archived
+          mv packages/*.zip packages/Archived/ || echo "No .zip files to archive"
+
+      # Step 5: Fetch the latest release zip file from the source repository
+      - name: Fetch latest release zip file
+        run: |
+          # Fetch the latest release info using GitHub API
+          LATEST_RELEASE=$(curl -s https://api.github.com/repos/altfreq07/plugin.video.fenlight/releases/latest)
+          
+          # Extract the browser_download_url for the zip file
+          DOWNLOAD_URL=$(echo "$LATEST_RELEASE" | jq -r '.assets[] | select(.name | endswith(".zip")) | .browser_download_url')
+          echo "Latest release download URL: $DOWNLOAD_URL"
+        
+          # Download the release zip file with its original name
+          curl -L "$DOWNLOAD_URL" -O
+        
+          # Move the zip file to the `packages` folder
+          FILENAME=$(basename "$DOWNLOAD_URL")
+          mv "$FILENAME" packages/
+
+      # Step 6: Prepare Release Information
+      - name: Prepare Release Information
+        id: prepare
+        run: |
+          VERSION=$(cat packages/fen_light_version | tr -d '\n')
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+          echo "::set-output name=version::${VERSION}"
+          echo "::set-output name=changes_path::packages/fen_light_changes"
+          echo "::set-output name=zip_name::packages/$FILENAME"
+
+      # Step 7: Remove the source-repo folder
       - name: Clean up source-repo folder
         run: |
           rm -rf source-repo
 
-      # Commit changes
+      # Step 8: Commit changes
       - name: Commit changes
         run: |
           git config user.name "github-actions[bot]"
@@ -35,9 +68,23 @@ jobs:
           git add .
           git commit -m "Sync version and changes from source repository" || echo "No changes to commit"
 
-      # Push changes back to the repository
+      # Step 9: Push changes back to the repository
       - name: Push changes
         run: |
           git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Step 10: Publish Release
+      - name: Publish Release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: "v${{ env.VERSION }}"
+          name: "Fenlight v${{ env.VERSION }}"
+          bodyFile: ${{ steps.prepare.outputs.changes_path }}
+          artifacts: ${{ steps.prepare.outputs.zip_name }}
+          prerelease: false
+          allowUpdates: true
+          replacesArtifacts: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
