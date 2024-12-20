@@ -61,8 +61,16 @@ jobs:
       - name: Clean up source-repo folder
         run: |
           rm -rf source-repo
+    
+      # Step 7: Create or update index.html with link to the latest zip
+      - name: Create or Update index.html
+        run: |
+          # Create the index.html file with a link to the latest zip file
+          echo "<!DOCTYPE html>" > packages/index.html
+          echo "<a href=\"${FILENAME}\">${FILENAME}</a>" >> packages/index.html
 
-      # Step 8: Commit changes
+
+      # Step 9: Commit changes
       - name: Commit changes
         run: |
           git config user.name "github-actions[bot]"
@@ -70,14 +78,14 @@ jobs:
           git add .
           git commit -m "Sync version and changes from source repository" || echo "No changes to commit"
 
-      # Step 9: Push changes back to the repository
+      # Step 10: Push changes back to the repository
       - name: Push changes
         run: |
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Step 10: Publish Release
+      # Step 11: Publish Release
       - name: Publish Release
         uses: ncipollo/release-action@v1
         with:
